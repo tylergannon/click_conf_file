@@ -24,13 +24,6 @@ def callback(
 ) -> dict:
     "The callback to the click option which is configured in `params_from_conf`"
     app_name = app_name or ctx.info_name
-    try_path = (
-        []
-        if try_path is None
-        else try_path
-        if isinstance(try_path, list)
-        else [try_path]
-    ) + LOOK_IN
     path_mapper = partial(expandall, app_name)
     if fpath is None:
         fpaths = list(filter(exists, map(path_mapper, try_path)))
@@ -59,12 +52,13 @@ def callback(
     return config
 
 
-def conf_option(
+def conf_option(  # pylint: disable=R0913
     app_name: str = None,
     param_names: Iterable[str] = ("-c", "--config"),
     send_param: bool = False,
     try_path: List[str] = None,
     is_eager: bool = True,
+    show_default: bool = None,
 ):
     """
     Decorate click commands with the ability to load parameters from a
@@ -89,15 +83,38 @@ def conf_option(
     :param is_eager: Forwarded to :function:`click.option`.  If you don't know why
         you'd need this, you probably don't.
     """
+    try_path = (
+        []
+        if try_path is None
+        else try_path
+        if isinstance(try_path, list)
+        else [try_path]
+    ) + LOOK_IN
+
+    # Add default path locations to help text, either if requested,
+    # or else if not specifically declined but app_name was given.
+    if app_name is not None:
+        try_path = [path.format(app_name=app_name) for path in try_path]
+    if show_default is None:
+        show_default = app_name is not None
+    help_text = "Optional TOML conf file path."
+    default_text = (
+        show_default
+        if isinstance(show_default, str)
+        else "Look in " + ", ".join(try_path)
+    )
 
     def decorator(function):
-        "The decorator"
+        "The decorator."
         click_opt = click.option(
             *param_names,
             type=click.Path(exists=True, dir_okay=False),
             expose_value=send_param,
             callback=partial(callback, app_name, try_path),
             is_eager=is_eager,
+            default=lambda: None,
+            help=help_text,
+            show_default=(default_text if show_default else False),
         )
         return click_opt(function)
 

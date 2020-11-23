@@ -114,3 +114,48 @@ def test_okay_to_put_config_sections(conf2_path, clirunner: CliRunner):
 
     result = clirunner.invoke(testapp, ["--config", conf2_path])
     assert result.exit_code == 0
+
+
+def test_help_text_no_app_name(clirunner: CliRunner):
+    "Don't add paths to help text if no app_name given."
+
+    @click.command("testapp")
+    @conf_option(try_path="/nowhere/special.toml")
+    @click.option("-v", "--val1")
+    @click.option("-a", "--awesomeval", type=int)
+    def testapp(val1, awesomeval, config):  # pylint: disable=W0613
+        "The test app"
+
+    result = clirunner.invoke(testapp, ["--help"])
+    assert "nowhere" not in result.stdout
+
+
+def test_help_text_with_app_name(clirunner: CliRunner):
+    "Add path to help text if app_name given."
+
+    @click.command("testapp")
+    @conf_option(try_path="/nowhere/special.toml", app_name="testapp")
+    @click.option("-v", "--val1")
+    @click.option("-a", "--awesomeval", type=int)
+    def testapp(val1, awesomeval, config):  # pylint: disable=W0613
+        "The test app"
+
+    result = clirunner.invoke(testapp, ["--help"])
+    assert "nowhere" in result.stdout
+    assert "$HOME/.testapprc" in result.stdout
+
+
+def test_help_text_has_defaults_if_requested(clirunner: CliRunner):
+    "Add path to help text if show_defaults=True"
+
+    @click.command("testapp")
+    @conf_option(try_path="/nowhere/special.toml", show_default=True)
+    @click.option("-v", "--val1")
+    @click.option("-a", "--awesomeval", type=int)
+    def testapp(val1, awesomeval, config):  # pylint: disable=W0613
+        "The test app"
+
+    result = clirunner.invoke(testapp, ["--help"])
+    # assert "nowhere" in result.stdout
+    # assert "$HOME/.testapprc" in result.stdout
+    print(result.stdout)
