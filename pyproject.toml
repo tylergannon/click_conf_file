@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "click_conf_file"
+version = "0.1.0"
+description = "Allows use of configuration files for setting options on click apps."
+authors = ["Tyler Gannon <tgannon@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+click = "^7.1.2"
+toml = "^0.10.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

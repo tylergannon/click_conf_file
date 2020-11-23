@@ -1,0 +1,8 @@
+val1 = "YES"
+val2 = true
+val3 = 1
+[testapp]
+awesomeval = 12345
+[wrongapp]
+awesomeval = 54321
+nothingval = false
