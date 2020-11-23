@@ -33,11 +33,13 @@ def callback(
     ) + LOOK_IN
     path_mapper = partial(expandall, app_name)
     if fpath is None:
-        fpath = next(path for path in map(path_mapper, try_path) if exists(path))
-        if not isfile(fpath):
-            raise click.BadParameter(
-                f"{fpath} exists but is not a file.", ctx=ctx, param=param
-            )
+        fpaths = list(filter(exists, map(path_mapper, try_path)))
+        if len(fpaths) > 0:
+            fpath = fpaths[0]
+            if not isfile(fpath):
+                raise click.BadParameter(
+                    f"{fpath} exists but is not a file.", ctx=ctx, param=param
+                )
     if fpath is None:
         return fpath
 

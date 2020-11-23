@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "click_conf_file"
-version = "0.1.0"
+version = "0.1.1"
 description = "Allows use of configuration files for setting options on click apps."
 authors = ["Tyler Gannon <tgannon@gmail.com>"]
 

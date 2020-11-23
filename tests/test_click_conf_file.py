@@ -51,6 +51,20 @@ def test_loads_config_when_path_given(conf1_path, clirunner: CliRunner):
     assert result.exit_code == 0
 
 
+def test_okay_to_not_find_file(clirunner: CliRunner):
+    "Actually provides a value for configured parameters"
+
+    @click.command("testapp")
+    @click.option("-v", "--val1")
+    @conf_option()
+    def testapp(val1):
+        "The test app"
+        assert val1 is None
+
+    result = clirunner.invoke(testapp)
+    assert result.exit_code == 0
+
+
 def test_provides_value_for_param(conf1_path, clirunner: CliRunner):
     "Actually provides a value for configured parameters"
 
